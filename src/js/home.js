@@ -134,15 +134,16 @@ fetch("https://randomuser.me/api/hihoj")
   );
   console.log(actionList, dramaList, animationList);
 
-  function videoItemTemplate(movie) {
-    return `<div class="primaryPlaylistItem">
+  function videoItemTemplate(movie, category) {
+    return `<div class="primaryPlaylistItem" data-id="${movie.id}" data-category=${category} >
            <div class="primaryPlaylistItem-image">
+         
              <img src="${movie.medium_cover_image}">
            </div>
            <h4 class="primaryPlaylistItem-title">
              ${movie.title}
            </h4>
-         </div>`;
+         </div>`
   }
 
   function createTemplate(HTMLString) {
@@ -153,29 +154,29 @@ fetch("https://randomuser.me/api/hihoj")
 
   function addEventClick($element) {
     $element.addEventListener("click", () => {
-      showModal();
+      showModal($element);
     });
   }
 
   //console.log (videoItemTemplate('src/images/covers/bitcoin.jpg', 'bitcoin'));
 
-  function renderMovieList(list, $container) {
+  function renderMovieList(list, $container, category) {
     $container.children[0].remove();
     // actionList.data.movie
     list.forEach(movie => {
-      const HTMLString = videoItemTemplate(movie);
+      const HTMLString = videoItemTemplate(movie, category);
       const movieElement = createTemplate(HTMLString);
       $container.append(movieElement);
       addEventClick(movieElement);
     });
   }
   const $actionContainer = document.querySelector("#action");
-  renderMovieList(actionList.data.movies, $actionContainer);
+  renderMovieList(actionList.data.movies, $actionContainer,'action');
 
   const $dramaContainer = document.getElementById("drama");
-  renderMovieList(dramaList.data.movies, $dramaContainer);
+  renderMovieList(dramaList.data.movies, $dramaContainer, 'drama');
   const $animationContainer = document.getElementById("animation");
-  renderMovieList(animationList.data.movies, $animationContainer);
+  renderMovieList(animationList.data.movies, $animationContainer,'animation');
 
   // const $home = $('.home, .list #item');
   const $modal = document.getElementById("modal");
@@ -186,9 +187,12 @@ fetch("https://randomuser.me/api/hihoj")
   const $modalImage = $modal.querySelector("img");
   const $modalDescription = $modal.querySelector("p");
 
-  function showModal() {
+  function showModal($element) {
     $overlay.classList.add("active");
     $modal.style.animation = "modalIn .8s forwards";
+     const id = $element.dataset.id;
+     const category = $element.dataset.category;
+
   }
 
   $hideModal.addEventListener("click", hideModal);
