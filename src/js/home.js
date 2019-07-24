@@ -74,9 +74,9 @@ fetch("https://randomuser.me/api/hihoj")
   //drama
   //Animación
   async function getData(url) {
-    const response = await fetch(url)
-    const data = await response.json()
-    return data
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
   }
 
   const actionList = await getData(
@@ -91,31 +91,41 @@ fetch("https://randomuser.me/api/hihoj")
   console.log(actionList, dramaList, animationList);
   // debugger
   function videoItemTemplate(movie) {
-    return (`<div class="primaryPlaylistItem">
+    return `<div class="primaryPlaylistItem">
            <div class="primaryPlaylistItem-image">
              <img src="${movie.medium_cover_image}">
            </div>
            <h4 class="primaryPlaylistItem-title">
              ${movie.title}
            </h4>
-         </div>`
-   )}
+         </div>`;
+  }
+
+  function createTemplate(HTMLString) {
+    const html = document.implementation.createHTMLDocument();
+    html.body.innerHTML = HTMLString;
+    return html.body.children[0];
+  }
 
   //console.log (videoItemTemplate('src/images/covers/bitcoin.jpg', 'bitcoin'));
+
+  function renderMovieList(list, $container) {
+    $container.children[0].remove();
+    // actionList.data.movie
+    list.forEach((movie) => {
+      const HTMLString = videoItemTemplate(movie);
+      const movieElement = createTemplate(HTMLString);
+      $container.append(movieElement);
+    });
+  }
   const $actionContainer = document.querySelector("#action");
-  actionList.data.movies.forEach((movie) => {
-    //debugger
-
-    const HTMLString = videoItemTemplate(movie);
-    const html = document.implementation.createHTMLDocument();
-    html.body.innerHTML = HTMLString; 
-    // debugger
-    $actionContainer.append(html.body.children[0]);
-    console.log(HTMLString);
-  })
-
-  const $dramaContainer = document.getElementById("#drama");
-  const $animationContainer = document.getElementById("#anomation");
+  renderMovieList( actionList.data.movies, $actionContainer);
+  
+  
+  const $dramaContainer = document.getElementById("drama");
+  renderMovieList(dramaList.data.movies, $dramaContainer);
+  const $animationContainer = document.getElementById("animation");
+  renderMovieList(animationList.data.movies, $animationContainer);
 
   const $featuringContainer = document.getElementById("#featuring");
   const $form = document.getElementById("#form");
