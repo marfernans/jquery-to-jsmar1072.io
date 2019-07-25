@@ -76,7 +76,11 @@ fetch("https://randomuser.me/api/hihoj")
   async function getData(url) {
     const response = await fetch(url);
     const data = await response.json();
-    return data;
+    if (data.data.movie_count > 0) {
+      // aquí se acaba
+      return data;
+    }
+    // si no hay pelis aquí continua
   }
   const $form = document.getElementById("form");
   const $home = document.getElementById("home");
@@ -116,19 +120,22 @@ fetch("https://randomuser.me/api/hihoj")
     $featuringContainer.append($loader);
 
     const data = new FormData($form);
-    const {
-      data: { movies: pelis }
-    } = await getData(
-      `${BASE__API}list_movies.json?limit=1&query_term=${data.get("name")}`
-    );
+    try {
+      const {
+        data: { movies: pelis }
+      } = await getData(
+        `${BASE__API}list_movies.json?limit=1&query_term=${data.get("name")}`
+      );
 
-    const HTMString = featuringTemplate(pelis[0]);
-    $featuringContainer.innerHTML = HTMString;
+      const HTMString = featuringTemplate(pelis[0]);
+      $featuringContainer.innerHTML = HTMString;
+    } catch (error) {
+      alert(error.message);
+      $loader.remove();
+      $home.classList.remove("search-active");
+    }
   });
 
-
-
-  
   function videoItemTemplate(movie, category) {
     return `<div class="primaryPlaylistItem" data-id="${
       movie.id
@@ -170,23 +177,34 @@ fetch("https://randomuser.me/api/hihoj")
     });
   }
 
-  const {
-    data: { movies: actionList }
-  } = await getData(`${BASE__API}list_movies.json?genre=action`);
+  async function cacheExist(category) {
+    const listName = `${category} List`;
+    const cacheList = window.localStorage.getItem(listName);
+    if (cacheList) {
+      return JSON.parse(cacheList);
+    }
+
+    const {
+      data: { movies: data }
+    } = await getData(`${BASE__API}list_movies.json?genre=${category}`);
+    window.localStorage.setItem("listName", JSON.stringify(data));
+
+    return data;
+  }
+
+  // const {
+  //   data: { movies: actionList }
+  // } = await getData(`${BASE__API}list_movies.json?genre=action`);
+
+  const actionList = await cacheExist("action");
   const $actionContainer = document.querySelector("#action");
   renderMovieList(actionList, $actionContainer, "action");
-  
-  
-  
-  const {
-    data: { movies: dramaList }
-  } = await getData(`${BASE__API}list_movies.json?genre=drama`);
+
+  const dramaList = await cacheExist("drama");
   const $dramaContainer = document.getElementById("drama");
   renderMovieList(dramaList, $dramaContainer, "drama");
-  
-  const {
-    data: { movies: animationList }
-  } = await getData(`${BASE__API}list_movies.json?genre=animation`);
+
+  const animationList = await cacheExist("animation");
   const $animationContainer = document.getElementById("animation");
   renderMovieList(animationList, $animationContainer, "animation");
 
