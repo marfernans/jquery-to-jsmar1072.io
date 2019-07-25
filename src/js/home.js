@@ -126,17 +126,9 @@ fetch("https://randomuser.me/api/hihoj")
     $featuringContainer.innerHTML = HTMString;
   });
 
-  const {
-    data: { movies: actionList }
-  } = await getData(`${BASE__API}list_movies.json?genre=action`);
-  const {
-    data: { movies: dramaList }
-  } = await getData(`${BASE__API}list_movies.json?genre=drama`);
-  const {
-    data: { movies: animationList }
-  } = await getData(`${BASE__API}list_movies.json?genre=animation`);
-  console.log(actionList, dramaList, animationList);
 
+
+  
   function videoItemTemplate(movie, category) {
     return `<div class="primaryPlaylistItem" data-id="${
       movie.id
@@ -147,7 +139,7 @@ fetch("https://randomuser.me/api/hihoj")
            <h4 class="primaryPlaylistItem-title">
              ${movie.title}
            </h4>
-         </div>`
+         </div>`;
   }
 
   function createTemplate(HTMLString) {
@@ -162,28 +154,42 @@ fetch("https://randomuser.me/api/hihoj")
     });
   }
 
-  //console.log (videoItemTemplate('src/images/covers/bitcoin.jpg', 'bitcoin'));
-
   function renderMovieList(list, $container, category) {
     $container.children[0].remove();
-    // actionList.data.movie
+
     list.forEach(movie => {
       const HTMLString = videoItemTemplate(movie, category);
       const movieElement = createTemplate(HTMLString);
       $container.append(movieElement);
+      const image = movieElement.querySelector("img");
+
+      image.addEventListener("load", event => {
+        event.srcElement.classList.add("fadeIn");
+      });
       addEventClick(movieElement);
     });
   }
+
+  const {
+    data: { movies: actionList }
+  } = await getData(`${BASE__API}list_movies.json?genre=action`);
   const $actionContainer = document.querySelector("#action");
   renderMovieList(actionList, $actionContainer, "action");
-
+  
+  
+  
+  const {
+    data: { movies: dramaList }
+  } = await getData(`${BASE__API}list_movies.json?genre=drama`);
   const $dramaContainer = document.getElementById("drama");
   renderMovieList(dramaList, $dramaContainer, "drama");
-
+  
+  const {
+    data: { movies: animationList }
+  } = await getData(`${BASE__API}list_movies.json?genre=animation`);
   const $animationContainer = document.getElementById("animation");
   renderMovieList(animationList, $animationContainer, "animation");
 
-  // const $home = $('.home, .list #item');
   const $modal = document.getElementById("modal");
   const $overlay = document.getElementById("overlay");
   const $hideModal = document.getElementById("hide-modal");
@@ -228,13 +234,4 @@ fetch("https://randomuser.me/api/hihoj")
     $overlay.classList.remove("active");
     $modal.style.animation = "modalOut .8s forwards";
   }
-
-  //   '<div class="primaryPlaylistItem">'
-  //   '<div class="primaryPlaylistItem-image">'
-  //     '<img src="src/images/covers/midnight.jpg">'
-  //   '</div>'
-  //   '<h4 class="primaryPlaylistItem-title">'
-  //     //Titulo de la peli
-  //   '</h4>'
-  // '</div>'
 })();
